@@ -65,9 +65,14 @@ export const useTasksStore = create<TasksState>()(
         if (!res) return;
         try {
           const data = await res.json();
-          set({ tasks: data });
+          if (Array.isArray(data)) {
+            set({ tasks: data });
+          } else {
+            set({ tasks: [] });
+          }
         } catch (err) {
           console.error('Failed to fetch tasks:', err);
+          set({ tasks: [] });
         }
       },
       addTask: async (t) => {
