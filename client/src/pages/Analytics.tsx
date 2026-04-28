@@ -50,17 +50,18 @@ export default function Analytics() {
   }, [sessions, days]);
 
   const habitData = useMemo(() => {
+    if (!Array.isArray(habits)) return [];
     return habits.map((h) => {
-      const total = Object.keys(h.history).length;
-      const done = Object.values(h.history).filter(Boolean).length;
+      const total = Object.keys(h.history || {}).length;
+      const done = Object.values(h.history || {}).filter(Boolean).length;
       const pct = total ? Math.round((done / total) * 100) : 0;
       return { name: h.name, pct, fill: h.color };
     });
   }, [habits]);
 
-  const avgProductivity = Math.round(productivityData.reduce((a, b) => a + b.pct, 0) / productivityData.length);
-  const totalFocus = +focusData.reduce((a, b) => a + b.hrs, 0).toFixed(1);
-  const bestHabit = habitData.reduce((a, b) => (b.pct > (a?.pct ?? 0) ? b : a), habitData[0]);
+  const avgProductivity = productivityData.length ? Math.round(productivityData.reduce((a, b) => a + b.pct, 0) / productivityData.length) : 0;
+  const totalFocus = focusData.length ? +focusData.reduce((a, b) => a + b.hrs, 0).toFixed(1) : 0;
+  const bestHabit = habitData.length > 0 ? habitData.reduce((a, b) => (b.pct > (a?.pct ?? 0) ? b : a), habitData[0]) : null;
 
   return (
     <div className="space-y-6">
