@@ -19,17 +19,18 @@ function useStats() {
 
   return useMemo(() => {
     const today = new Date().toISOString().slice(0, 10);
-    const todays = tasks.filter((t) => t.date === today);
+    const safeTasks = Array.isArray(tasks) ? tasks : [];
+    const safeHabits = Array.isArray(habits) ? habits : [];
+    const safeSessions = Array.isArray(sessions) ? sessions : [];
+
+    const todays = safeTasks.filter((t) => t.date === today);
     const done = todays.filter((t) => t.completed).length;
     const productivity = todays.length ? Math.round((done / todays.length) * 100) : 0;
 
     const weekAgo = Date.now() - 7 * 86400000;
-    const focusMin = sessions.filter((s) => s.startedAt > weekAgo).reduce((a, b) => a + b.durationMin, 0);
+    const focusMin = safeSessions.filter((s) => s.startedAt > weekAgo).reduce((a, b) => a + b.durationMin, 0);
     const focusHrs = +(focusMin / 60).toFixed(1);
 
-    const streak = Math.max(0, ...habits.map((h) => computeStreak(h.history)));
-
-    const doneHabitsToday = habits.filter((h) => h.history[today]).length;
     const habitPct = habits.length ? Math.round((doneHabitsToday / habits.length) * 100) : 0;
 
     return { productivity, focusHrs, streak, habitPct, todays, done };
@@ -37,10 +38,9 @@ function useStats() {
 }
 
 export default function Dashboard() {
-  const [addOpen, setAddOpen] = useState(false);
   const nav = useNavigate();
   const { productivity, focusHrs, streak, habitPct, todays } = useStats();
-  const upcomingEvents = useEventsStore((s) => s.events);
+  const upcomingEvents = useEventsStore((s) => s.events) || [];
 
   const byPriority = useMemo(() => {
     const o = { must: [] as typeof todays, should: [] as typeof todays, optional: [] as typeof todays };
