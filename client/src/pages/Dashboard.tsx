@@ -41,6 +41,7 @@ function useStats() {
 }
 
 export default function Dashboard() {
+  const [addOpen, setAddOpen] = useState(false);
   const nav = useNavigate();
   const { productivity, focusHrs, streak, habitPct, todays } = useStats();
   const upcomingEvents = useEventsStore((s) => s.events) || [];
