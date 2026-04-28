@@ -33,9 +33,9 @@ export default function Analytics() {
 
   const productivityData = useMemo(() => {
     return days.map((d) => {
-      const todays = tasks.filter((t) => t.date === d);
+      const todays = Array.isArray(tasks) ? tasks.filter((t) => t.date === d) : [];
       const done = todays.filter((t) => t.completed).length;
-      const pct = todays.length ? Math.round((done / todays.length) * 100) : Math.round(40 + Math.random() * 50);
+      const pct = todays.length ? Math.round((done / todays.length) * 100) : 0;
       return { day: d.slice(5), pct };
     });
   }, [tasks, days]);
