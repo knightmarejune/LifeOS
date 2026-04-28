@@ -31,7 +31,10 @@ function useStats() {
     const focusMin = safeSessions.filter((s) => s.startedAt > weekAgo).reduce((a, b) => a + b.durationMin, 0);
     const focusHrs = +(focusMin / 60).toFixed(1);
 
-    const habitPct = habits.length ? Math.round((doneHabitsToday / habits.length) * 100) : 0;
+    const streak = safeHabits.length > 0 ? Math.max(0, ...safeHabits.map((h) => computeStreak(h.history || {}))) : 0;
+
+    const doneHabitsToday = safeHabits.filter((h) => h.history && h.history[today]).length;
+    const habitPct = safeHabits.length ? Math.round((doneHabitsToday / safeHabits.length) * 100) : 0;
 
     return { productivity, focusHrs, streak, habitPct, todays, done };
   }, [tasks, habits, sessions]);
